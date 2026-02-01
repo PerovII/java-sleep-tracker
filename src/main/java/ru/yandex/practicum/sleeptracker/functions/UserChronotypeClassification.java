@@ -37,7 +37,7 @@ public class UserChronotypeClassification implements Function<List<SleepingSessi
                     return UserChronotype.DOVE;
                 })
                 .collect(Collectors.toMap(
-                        c-> c,
+                        c -> c,
                         c -> 1,
                         Integer::sum
                 ));
