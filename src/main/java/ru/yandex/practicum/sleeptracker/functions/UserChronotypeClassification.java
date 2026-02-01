@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 
 public class UserChronotypeClassification implements Function<List<SleepingSession>, SleepAnalysisResult<String>> {
 
-    private final int MORNING_HOUR = 6;
-    private final int OWL_START_SLEEPING_HOUR = 23;
-    private final int OWL_END_SLEEPING_HOUR = 9;
-    private final int LARK_START_SLEEPING_HOUR = 22;
-    private final int LARK_END_SLEEPING_HOUR = 7;
+    private static final int MORNING_HOUR = 6;
+    private static final int OWL_START_SLEEPING_HOUR = 23;
+    private static final int OWL_END_SLEEPING_HOUR = 9;
+    private static final int LARK_START_SLEEPING_HOUR = 22;
+    private static final int LARK_END_SLEEPING_HOUR = 7;
 
     @Override
     public SleepAnalysisResult<String> apply(List<SleepingSession> sessions) {

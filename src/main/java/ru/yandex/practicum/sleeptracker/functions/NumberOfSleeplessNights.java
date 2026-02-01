@@ -12,8 +12,8 @@ import java.util.function.Function;
 
 public class NumberOfSleeplessNights implements Function<List<SleepingSession>, SleepAnalysisResult<Long>> {
 
-    private final int MORNING_HOUR = 6;
-    private final int AFTERNOON_HOUR = 12;
+    private static final int MORNING_HOUR = 6;
+    private static final int AFTERNOON_HOUR = 12;
 
     @Override
     public SleepAnalysisResult<Long> apply(List<SleepingSession> sessions) {
@@ -21,7 +21,7 @@ public class NumberOfSleeplessNights implements Function<List<SleepingSession>, 
                 .stream()
                 .filter(s ->
                         (!s.getStartSleeping().toLocalDate().equals(s.getEndSleeping().toLocalDate())) ||
-                                (s.getStartSleeping().getHour() < MORNING_HOUR ))
+                                (s.getStartSleeping().getHour() < MORNING_HOUR))
                 .count();
 
         LocalDate startRecording = sessions
