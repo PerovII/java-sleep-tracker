@@ -24,7 +24,7 @@ public class SleepTrackerApp {
             functions.add(new UserChronotypeClassification());
 
             functions.stream()
-                    .map(f ->f.apply(sleepingSessions))
+                    .map(f -> f.apply(sleepingSessions))
                     .forEach(r -> System.out.println(r.getDescription() + ": " + r.getValue()));
 
 
