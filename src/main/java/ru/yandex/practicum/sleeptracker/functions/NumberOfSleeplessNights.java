@@ -4,10 +4,13 @@ import ru.yandex.practicum.sleeptracker.SleepAnalysisResult;
 import ru.yandex.practicum.sleeptracker.SleepingSession;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
-
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class NumberOfSleeplessNights implements Function<List<SleepingSession>, SleepAnalysisResult<Long>> {
@@ -17,12 +20,10 @@ public class NumberOfSleeplessNights implements Function<List<SleepingSession>, 
 
     @Override
     public SleepAnalysisResult<Long> apply(List<SleepingSession> sessions) {
-        long nightSleeps = sessions
-                .stream()
-                .filter(s ->
-                        (!s.getStartSleeping().toLocalDate().equals(s.getEndSleeping().toLocalDate())) ||
-                                (s.getStartSleeping().getHour() < MORNING_HOUR))
-                .count();
+
+        if (sessions.isEmpty()) {
+            return new SleepAnalysisResult<>("Количество бессонных ночей", 0L);
+        }
 
         LocalDate startRecording = sessions
                 .stream()
@@ -45,9 +46,30 @@ public class NumberOfSleeplessNights implements Function<List<SleepingSession>, 
                 .max(LocalDate::compareTo)
                 .orElse(null);
 
-        long totalNights = ChronoUnit.DAYS.between(startRecording, stopRecording) + 1;
-        long sleplessNigths = totalNights - nightSleeps;
+        Set<LocalDate> nightSleeps = sessions.stream()
+                .flatMap(s -> {
+                    LocalDateTime start = s.getStartSleeping();
+                    LocalDateTime end = s.getEndSleeping();
 
-        return new SleepAnalysisResult<>("Количество бессонных ночей", sleplessNigths);
+                    if (!end.isAfter(start)) return Stream.empty();
+
+                    LocalDate d1 = start.toLocalDate();
+                    LocalDate d2 = end.toLocalDate();
+
+                    return Stream.of(d1, d2)
+                            .distinct()
+                            .filter(d -> {
+                                LocalDateTime windowStart = d.atStartOfDay();
+                                LocalDateTime windowEnd = d.atTime(MORNING_HOUR, 0);
+
+                                return start.isBefore(windowEnd) && end.isAfter(windowStart);
+                            });
+                })
+                .collect(Collectors.toSet());
+
+        long totalNights = ChronoUnit.DAYS.between(startRecording, stopRecording) + 1;
+        long sleeplessNights = totalNights - nightSleeps.size();
+
+        return new SleepAnalysisResult<>("Количество бессонных ночей", sleeplessNights);
     }
 }
