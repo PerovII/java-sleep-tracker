@@ -4,13 +4,12 @@ import ru.yandex.practicum.sleeptracker.SleepAnalysisResult;
 import ru.yandex.practicum.sleeptracker.SleepingSession;
 import ru.yandex.practicum.sleeptracker.UserChronotype;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class UserChronotypeClassification implements Function<List<SleepingSession>, SleepAnalysisResult<String>> {
+public class UserChronotypeClassification implements Function<List<SleepingSession>, SleepAnalysisResult<UserChronotype>> {
 
     private static final int MORNING_HOUR = 6;
     private static final int OWL_START_SLEEPING_HOUR = 23;
@@ -19,8 +18,8 @@ public class UserChronotypeClassification implements Function<List<SleepingSessi
     private static final int LARK_END_SLEEPING_HOUR = 7;
 
     @Override
-    public SleepAnalysisResult<String> apply(List<SleepingSession> sessions) {
-        Map<UserChronotype, Integer> chronotypes = (HashMap<UserChronotype, Integer>) sessions
+    public SleepAnalysisResult<UserChronotype> apply(List<SleepingSession> sessions) {
+        Map<UserChronotype, Integer> chronotypes = sessions
                 .stream()
                 .filter(s ->
                     (!s.getStartSleeping().toLocalDate().equals(s.getEndSleeping().toLocalDate())) ||
@@ -46,10 +45,10 @@ public class UserChronotypeClassification implements Function<List<SleepingSessi
         int lark = chronotypes.getOrDefault(UserChronotype.LARK, 0);
         int dove = chronotypes.getOrDefault(UserChronotype.DOVE, 0);
 
-        String chronotype;
-        if (owl > lark && owl > dove) chronotype = "сова";
-        else if (lark > owl && lark > dove) chronotype = "жаворонок";
-        else chronotype = "голубь";
+        UserChronotype chronotype;
+        if (owl > lark && owl > dove) chronotype = UserChronotype.OWL;
+        else if (lark > owl && lark > dove) chronotype = UserChronotype.LARK;
+        else chronotype = UserChronotype.DOVE;
 
         return new SleepAnalysisResult<>("Ваш хронотип", chronotype);
 
