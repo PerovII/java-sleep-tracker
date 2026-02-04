@@ -55,7 +55,7 @@ public class SleepTrackerAppTest {
 
     @Test
     void numberOfBadSession_returnsCountOfBadSessions() {
-        assertEquals(2L, new NumberOfBadSassions().apply(sleepingSessions).getValue());
+        assertEquals(2L, new NumberOfBadSessions().apply(sleepingSessions).getValue());
     }
 
     @Test
@@ -64,7 +64,7 @@ public class SleepTrackerAppTest {
         assertEquals(0L, new MinimumDurationSession().apply(empty).getValue());
         assertEquals(0L, new MaximumDurationSession().apply(empty).getValue());
         assertEquals(0L, new AverageDurationSession().apply(empty).getValue());
-        assertEquals(0L, new NumberOfBadSassions().apply(empty).getValue());
+        assertEquals(0L, new NumberOfBadSessions().apply(empty).getValue());
     }
 
     @Test
@@ -72,7 +72,8 @@ public class SleepTrackerAppTest {
 
         sleepingSessions = List.of(
 
-                session("2025-10-01T23:00", "2025-10-02T07:00", SleepQuality.GOOD),
+                session("2025-10-01T23:00", "2025-10-02T01:00", SleepQuality.GOOD),
+                session("2025-10-02T02:00", "2025-10-02T07:00", SleepQuality.GOOD),
                 session("2025-10-02T14:00", "2025-10-02T15:00", SleepQuality.BAD),
                 session("2025-10-03T13:30", "2025-10-03T14:00", SleepQuality.BAD)
         );
@@ -132,6 +133,14 @@ public class SleepTrackerAppTest {
     }
 
     @Test
+    void numberOfSleeplessNights_return_0_with_EmptyList() {
+
+        sleepingSessions = List.of();
+
+        assertEquals(0L, new NumberOfSleeplessNights().apply(sleepingSessions).getValue());
+    }
+
+    @Test
     void userChronotypeClassification_return_OWL() {
         List<SleepingSession> sleepingSession1;
         List<SleepingSession> sleepingSession2;
@@ -146,9 +155,9 @@ public class SleepTrackerAppTest {
                 session("2025-10-02T00:00", "2025-10-02T10:00", SleepQuality.GOOD)
         );
 
-        assertEquals("сова", new UserChronotypeClassification().apply(sleepingSession1).getValue());
-        assertEquals("сова", new UserChronotypeClassification().apply(sleepingSession2).getValue());
-        assertEquals("сова", new UserChronotypeClassification().apply(sleepingSession3).getValue());
+        assertEquals(UserChronotype.OWL, new UserChronotypeClassification().apply(sleepingSession1).getValue());
+        assertEquals(UserChronotype.OWL, new UserChronotypeClassification().apply(sleepingSession2).getValue());
+        assertEquals(UserChronotype.OWL, new UserChronotypeClassification().apply(sleepingSession3).getValue());
 
     }
 
@@ -159,28 +168,33 @@ public class SleepTrackerAppTest {
         List<SleepingSession> sleepingSession3;
         List<SleepingSession> sleepingSession4;
         List<SleepingSession> sleepingSession5;
-        List<SleepingSession> sleepingSession6;
-        List<SleepingSession> sleepingSession7;
 
         sleepingSession1 = List.of(session("2025-10-01T22:00", "2025-10-02T09:00", SleepQuality.GOOD));
         sleepingSession2 = List.of(session("2025-10-02T00:00", "2025-10-02T08:00", SleepQuality.GOOD));
         sleepingSession3 = List.of(session("2025-10-01T21:00", "2025-10-02T09:00", SleepQuality.GOOD));
         sleepingSession4 = List.of(session("2025-10-01T21:00", "2025-10-02T07:00", SleepQuality.GOOD));
         sleepingSession5 = List.of(session("2025-10-01T22:00", "2025-10-02T06:00", SleepQuality.GOOD));
-        sleepingSession6 = List.of(
-                session("2025-10-01T23:30", "2025-10-02T10:00", SleepQuality.GOOD),
-                session("2025-10-02T00:00", "2025-10-02T10:00", SleepQuality.GOOD),
-                session("2025-10-01T21:30", "2025-10-02T06:30", SleepQuality.GOOD),
-                session("2025-10-01T21:00", "2025-10-02T06:00", SleepQuality.GOOD)
+
+        assertEquals(UserChronotype.DOVE, new UserChronotypeClassification().apply(sleepingSession1).getValue());
+        assertEquals(UserChronotype.DOVE, new UserChronotypeClassification().apply(sleepingSession2).getValue());
+        assertEquals(UserChronotype.DOVE, new UserChronotypeClassification().apply(sleepingSession3).getValue());
+        assertEquals(UserChronotype.DOVE, new UserChronotypeClassification().apply(sleepingSession4).getValue());
+        assertEquals(UserChronotype.DOVE, new UserChronotypeClassification().apply(sleepingSession5).getValue());
+
+    }
+
+    @Test
+    void userChronotypeClassificationWithEqualsCount_return_DOVE() {
+        List<SleepingSession> sleepingSession;
+
+        sleepingSession = List.of(
+                session("2025-10-01T23:30", "2025-10-02T10:00", SleepQuality.GOOD), //OWL
+                session("2025-10-02T00:00", "2025-10-02T10:00", SleepQuality.GOOD), //OWL
+                session("2025-10-01T21:30", "2025-10-02T06:30", SleepQuality.GOOD), //LARK
+                session("2025-10-01T21:00", "2025-10-02T06:00", SleepQuality.GOOD) //LARK
         );
 
-        assertEquals("голубь", new UserChronotypeClassification().apply(sleepingSession1).getValue());
-        assertEquals("голубь", new UserChronotypeClassification().apply(sleepingSession2).getValue());
-        assertEquals("голубь", new UserChronotypeClassification().apply(sleepingSession3).getValue());
-        assertEquals("голубь", new UserChronotypeClassification().apply(sleepingSession4).getValue());
-        assertEquals("голубь", new UserChronotypeClassification().apply(sleepingSession5).getValue());
-        assertEquals("голубь", new UserChronotypeClassification().apply(sleepingSession6).getValue());
-
+        assertEquals(UserChronotype.DOVE, new UserChronotypeClassification().apply(sleepingSession).getValue());
     }
 
     @Test
@@ -198,9 +212,9 @@ public class SleepTrackerAppTest {
                 session("2025-10-02T22:00", "2025-10-02T08:00", SleepQuality.GOOD)
         );
 
-        assertEquals("жаворонок", new UserChronotypeClassification().apply(sleepingSession1).getValue());
-        assertEquals("жаворонок", new UserChronotypeClassification().apply(sleepingSession2).getValue());
-        assertEquals("жаворонок", new UserChronotypeClassification().apply(sleepingSession3).getValue());
+        assertEquals(UserChronotype.LARK, new UserChronotypeClassification().apply(sleepingSession1).getValue());
+        assertEquals(UserChronotype.LARK, new UserChronotypeClassification().apply(sleepingSession2).getValue());
+        assertEquals(UserChronotype.LARK, new UserChronotypeClassification().apply(sleepingSession3).getValue());
 
     }
 }
